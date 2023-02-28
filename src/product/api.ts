@@ -11,18 +11,15 @@ export default {
           responseType: "blob",
         }
       )
-      .then((res) => {
-        return new Promise<Product[]>((resolve, reject) => {
-          Papa.parse(res.data, {
-            header: true,
-            complete: (results) => {
-              return resolve(results.data as Product[]);
-            },
-            error: (error) => {
-              return reject(error.message);
-            },
-          });
-        });
-      });
+      .then(
+        (res) =>
+          new Promise<Product[]>((resolve, reject) => {
+            Papa.parse(res.data, {
+              header: true,
+              complete: (results) => resolve(results.data as Product[]),
+              error: (error) => reject(error.message),
+            });
+          })
+      );
   },
 };
