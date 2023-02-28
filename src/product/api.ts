@@ -1,4 +1,5 @@
 import { Product } from "./types";
+import Papa from "papaparse";
 import axios from "axios";
 
 export default {
@@ -11,7 +12,17 @@ export default {
         }
       )
       .then((res) => {
-        return res.data;
+        return new Promise<Product[]>((resolve, reject) => {
+          Papa.parse(res.data, {
+            header: true,
+            complete: (results) => {
+              return resolve(results.data as Product[]);
+            },
+            error: (error) => {
+              return reject(error.message);
+            },
+          });
+        });
       });
   },
 };
