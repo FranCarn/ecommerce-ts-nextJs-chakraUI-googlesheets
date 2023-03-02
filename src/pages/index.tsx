@@ -8,7 +8,7 @@ interface Props {
 }
 
 const IndexRoute: React.FC<Props> = ({ products }) => {
-  return <div style={{ maxWidth: "1400px" }}>{JSON.stringify(products)}</div>;
+  return <div>{JSON.stringify(products)}</div>;
 };
 
 export const getStaticProps: GetStaticProps = async () => {
