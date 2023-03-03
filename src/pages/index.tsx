@@ -1,5 +1,6 @@
 import api from "@/product/api";
 import { Product } from "@/product/types";
+import { Grid, Stack, Text } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import React from "react";
 
@@ -8,7 +9,15 @@ interface Props {
 }
 
 const IndexRoute: React.FC<Props> = ({ products }) => {
-  return <div>{JSON.stringify(products)}</div>;
+  return (
+    <Grid gridGap={6} templateColumns="repeat(auto-fill, minmax(240px, 1fr))">
+      {products.map((product) => (
+        <Stack backgroundColor="gray.100" key={product.id}>
+          <Text>{product.title}</Text>
+        </Stack>
+      ))}
+    </Grid>
+  );
 };
 
 export const getStaticProps: GetStaticProps = async () => {
