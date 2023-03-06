@@ -1,6 +1,22 @@
 import api from "@/product/api";
 import { Product } from "@/product/types";
-import { Button, Flex, Grid, Image, Link, Stack, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  Grid,
+  Image,
+  Input,
+  Link,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import React, { useMemo, useState } from "react";
 
@@ -18,10 +34,16 @@ function parseCurrency(value: number): string {
 
 const IndexRoute: React.FC<Props> = ({ products }) => {
   const [cart, setCart] = useState<Product[]>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   function handleAddtoCart(product: Product) {
     setCart((cart) => cart.concat(product));
   }
+  function handleCancel() {
+    setIsDrawerOpen(false);
+    setCart([]);
+  }
+
   const textToSend = useMemo(() => {
     return cart
       .reduce(
@@ -63,6 +85,7 @@ const IndexRoute: React.FC<Props> = ({ products }) => {
             <Text fontSize="sm" fontWeight={500} color="green.500">
               {parseCurrency(product.price)}
             </Text>
+
             <Button
               onClick={() => handleAddtoCart(product)}
               colorScheme="primary"
@@ -75,25 +98,66 @@ const IndexRoute: React.FC<Props> = ({ products }) => {
         ))}
       </Grid>
       {cart.length && (
-        <Flex
-          padding={4}
-          position="sticky"
-          bottom={0}
-          alignItems="center"
-          justifyContent="center"
-        >
+        <Flex position="sticky" bottom={4} justifyContent="center">
           <Button
-            isExternal
-            as={Link}
-            colorScheme="whatsapp"
-            href={`https://wa.me/54911414141?text=${encodeURIComponent(
-              textToSend
-            )}`}
+            colorScheme="primary"
+            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
           >
-            Completar pedido ({cart.length}) productos
+            Ver Carrito
           </Button>
         </Flex>
       )}
+      <Drawer
+        isOpen={isDrawerOpen}
+        placement="right"
+        onClose={() => setIsDrawerOpen(!isDrawerOpen)}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Completar pedido</DrawerHeader>
+          <DrawerBody>
+            {cart.map((item) => (
+              <Flex key={item.id} justifyContent="space-between">
+                <Text>{item.title}</Text>
+                <Text fontSize="sm" fontWeight={500} color="green.500">
+                  {parseCurrency(item.price)}
+                </Text>
+              </Flex>
+            ))}
+          </DrawerBody>
+
+          <DrawerFooter>
+            <Stack>
+              <Flex justifyContent="space-between" color="red.700">
+                Total:{" "}
+                <span>
+                  {parseCurrency(
+                    cart.reduce((total, product) => total + product.price, 0)
+                  )}
+                </span>
+              </Flex>
+              <Button
+                isExternal
+                as={Link}
+                colorScheme="whatsapp"
+                href={`https://wa.me/54911414141?text=${encodeURIComponent(
+                  textToSend
+                )}`}
+              >
+                Completar pedido ({cart.length}) productos
+              </Button>
+              <Button
+                variant="outline"
+                colorScheme="secondary"
+                onClick={handleCancel}
+              >
+                Cancelar
+              </Button>
+            </Stack>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </Stack>
   );
 };
@@ -101,6 +165,7 @@ const IndexRoute: React.FC<Props> = ({ products }) => {
 export const getStaticProps: GetStaticProps = async () => {
   const products = await api.list();
   return {
+    revalidate: 10,
     props: {
       products,
     },
