@@ -70,16 +70,16 @@ const IndexRoute: React.FC<Props> = ({ products }) => {
             backgroundColor="gray.100"
             key={product.id}
           >
+            <Text>{product.category}</Text>
+            <Image
+              src={product.image}
+              alt={product.title}
+              width={300}
+              height={150}
+              objectFit="scale-down"
+            />
             <Stack spacing={1}>
-              <Text>{product.category}</Text>
               <Text>{product.title}</Text>
-              <Image
-                src={product.image}
-                alt={product.title}
-                width={300}
-                height={150}
-                objectFit="scale-down"
-              />
             </Stack>
             <Text>{product.description}</Text>
             <Text fontSize="sm" fontWeight={500} color="green.500">
